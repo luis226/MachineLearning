@@ -13,9 +13,9 @@ def absolute_residuals(y, y_hat):
 
 def mean_squared_error(y, y_hat):
     N = len(y)
-    return square_residuals(y, y_hat) / N
+    return np.sum(square_residuals(y, y_hat)) / N
 
 def mean_absolute_error(y, y_hat):
     N = len(y)
-    return absolute_residuals(y, y_hat) / N
+    return np.sum(absolute_residuals(y, y_hat)) / N
 
