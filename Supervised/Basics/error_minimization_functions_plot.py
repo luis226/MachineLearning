@@ -4,72 +4,71 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-df = pd.read_csv('data_1d.csv')
+def plot_real_and_pred_function(X_t, y_real, y_hat):
+    # Plots funtion with and without noise
+    plt.figure(0)
+    plt.plot(X_t[:, 1], y_real, color = 'red', alpha = 0.7, linestyle = '--')
+    plt.plot(X_t[:, 1], y_hat, color = 'green', alpha = 0.7)
+    plt.scatter(X_t[:, 1], y, s = 8)
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('Comparision between predicted and real f(x)')
+    plt.legend(["f(x)", 'f_pred(x)', "f(x) + N(mean, var)"])
+    plt.show()
 
 np.random.seed(20)
 
-#def plot_a_mse():
-a = 1 
+# Data parameters
+real_slope = 1
+real_intercept = 0
+a = 0
 b = 10
 N = 10
 mean = 0
 var = 0.5
 
+# Generating simulated data f(x) = ax + b + N(mean, var)
 X =  np.linspace(a, b, num = N)
-y_real = X * a + b 
+y_real = X * real_slope + real_intercept 
 y = y_real + np.random.normal(mean, var, size = N)
-#X, y = get_line_gausserr(1, 10, N = 10, mean = 0, var = 2.5)
-    
-plt.plot(X, y_real, color = 'red', alpha = 0.7)
 
-plt.scatter(X, y, s = 8)
+# Reshape vectors to ensure operations consistency
+y_real = y_real.reshape((N, 1))
+y = y.reshape((N, 1))
 
-plt.legend(["f(x)", "f(x + error)"])
-#
-#plt.xlim(0, 10)
-#plt.ylim(10, 20)
-#
-#plt.show()
+# Adds a ones row to be able to write this on matrix notation
+X = np.vstack((np.ones(shape = (N,)), X))
+X_t = X.T
 
-X = df.iloc[:, 0].values
-X_t = np.array([X]).T
-X_t = np.array([[1, 2, 3, 4, 3, 5]]).T
-
-
-x_0 = np.ones((len(X_t), 1))
-X_t = np.concatenate((x_0, X_t), axis = 1)
-X = X_t.T
-
-y = df.iloc[:, 1].values
-y = np.array([y]).T
-
-y = np.array([[1, 3, 3, 3, 5, 5]]).T
-
-
-w_t = np.array([[0, 1]])
+# Creating a vector to write the line model as matrix multiplication
+intercept_pred = 0.8
+slope_pred = 0.9
+w_t = np.array([[intercept_pred, slope_pred]])
 w = w_t.T
+
+# Predicted values are calculated by w_T * X
 y_hat = np.matmul(w_t, X).T
 
-#print(np.matmul(w_t, X ), np.matmul(w_t, X ).shape)
-#print(np.matmul(X_t, w ), np.matmul(X_t, w ).shape)
-#
-#plt.scatter(X_t[:, 1], y)
 
-#plt.plot(X_t[:, 1], y_hat)
-#plt.title("x vs f(X)")
-#plt.xlabel("x")
-#plt.ylabel("f(x)")
-#plt.show()
+plot_real_and_pred_function(X_t, y_real, y_hat)
 
 
 
+# Root mean squared error calculation
 y_diff = y - y_hat
 sqr_err = np.matmul(y_diff.T, y_diff) 
 mean_sqr_err = sqr_err / len(y)
-mean_root_sqr_err = np.sqrt(sqr_err) / len(y)
+mean_root_sqr_err = np.sqrt(sqr_err / len(y)) 
+
+abs_err = np.abs(y_diff)
+sqr = np.square(y_diff)
+table_err = np.concatenate((X_t[:, 1].reshape(N, 1), y, y_hat,
+                            y_diff, sqr ,abs_err), 
+                           axis = 1)
+df_err = pd.DataFrame(table_err, columns = ['X', 'f(x)', 'f_pred(x)', 'diff', 'SE', 'AE'])
 
 print("MSE: ", mean_sqr_err[0, 0])
-print("MRSE: ", mean_root_sqr_err[0, 0])
+print("RMSE: ", mean_root_sqr_err[0, 0])
 
 #a_intervals = np.linspace(-1, 2, num = 200)
 #b_intervals = np.linspace(1, 3, num = 200)
@@ -77,12 +76,6 @@ print("MRSE: ", mean_root_sqr_err[0, 0])
 N = 100
 #aa, bb = np.meshgrid(a_intervals, b_intervals)
 aa, bb = np.mgrid[-10:10:100j, -10:10:100j]
-
-
-
-#xy = np.array([[0, 1]
-#            , [1, 0.5]
-#            , [1, 1]])
 ab = np.vstack((aa.flatten(), bb.flatten()))
 ab_t = ab.T
 
@@ -98,23 +91,6 @@ sqr_err_matrix = np.matmul(y_diffs.T, y_diffs)
 rmse = np.diag(sqr_err_matrix).reshape((N, N))
 rmse = rmse / rmse.max()
 
-
-
-#import numpy as np
-#import matplotlib.pyplot as plt
-#xlist = np.linspace(-3.0, 3.0, 100)
-#ylist = np.linspace(-3.0, 3.0, 100)
-
-#plt.figure()
-##levels = [0.0, 0.025, 0.05, 0.075, 0.1, 0.2]
-##cp = plt.contour(aa, bb, rmse, levels = levels, colors='k')
-##plt.clabel(cp, colors = 'k', fmt = '%2.1f', fontsize=12)
-#contour_filled = plt.contourf(aa, bb, rmse)
-#plt.colorbar(contour_filled)
-#plt.title('Root mean squared error')
-#plt.xlabel('w_0')
-#plt.ylabel('w_1')
-#plt.show()
 
 import seaborn as sns
 
@@ -142,13 +118,7 @@ plt.title('RMSE Error')
 plt.xlabel('a (intercept)')
 plt.ylabel('b (slope)')
 plt.show()
-##import numpy as np
-#import matplotlib.pyplot as plt
-#xlist = np.linspace(-3.0, 3.0, 100)
-#ylist = np.linspace(-3.0, 3.0, 100)
-#X, Y = np.meshgrid(xlist, ylist)
-#Z = np.sqrt(X**2 + Y**2)
-#plt.show()
+
 
 '''
 ======================
