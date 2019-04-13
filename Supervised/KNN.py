@@ -9,7 +9,7 @@ import numpy as np
 from data import linear_function_gaussian_error, sinoidal_gaussian_error
 
 class KNN:
-    def __init__(self, neighbors):
+    def __init__(self, neighbors = 1):
         self.neighbors = neighbors
     
     def fit(self, X_train, Y_train):
@@ -36,30 +36,30 @@ class KNN:
         
         return y_pred
     
-np.random.seed(40)
-X = np.arange(0, 10, 0.2)
-y_real, y = sinoidal_gaussian_error(X, N = 10, var = 0.2)
-
-
-
-X_test = np.arange(0, 10, 0.01)
-
-neighbors = 2
-model = KNN(1)     
-model.fit(X, y)
-y_pred = model.predict(X_test)             
-                  
+#np.random.seed(40)
+#X = np.arange(0, 10, 0.2)
+#y_real, y = sinoidal_gaussian_error(X, N = 10, var = 0.2)
 #
-
-
-    
-plt.scatter(X, y)
-plt.plot(X_test, y_pred, color = 'green', alpha = 0.7)
-#plt.legend(['f(x)', 'f(x) + gaussian_error', 'KNN k = 2'])
-
-plt.scatter(X, y, s = 10)
-plt.plot(X, y_real, color = 'red', alpha = 0.7)
-plt.show()
+#
+#
+#X_test = np.arange(0, 10, 0.01)
+#
+#neighbors = 2
+#model = KNN(1)     
+#model.fit(X, y)
+#y_pred = model.predict(X_test)             
+#                  
+##
+#
+#
+#    
+#plt.scatter(X, y)
+#plt.plot(X_test, y_pred, color = 'green', alpha = 0.7)
+##plt.legend(['f(x)', 'f(x) + gaussian_error', 'KNN k = 2'])
+#
+#plt.scatter(X, y, s = 10)
+#plt.plot(X, y_real, color = 'red', alpha = 0.7)
+#plt.show()
     
 
 #plt.plot(X_test, y_pred)

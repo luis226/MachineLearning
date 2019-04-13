@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from error_functions import *
 
 def plot_real_and_pred_function(X_t, y_real, y_hat):
     # Plots funtion with and without noise
